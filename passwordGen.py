@@ -2,9 +2,8 @@
 #
 #       Name:         Kyle McColgan
 #       File name:    passwordGen.py
-#       Date:         15 November 2024
-#       Description:
-#               This program provides a GUI based client to generate URL-friendly passwords.
+#       Date:         11 November 2025
+#       Description: This program provides a GUI-based client to generate URL-friendly passwords.
 #
 #****************************************************************************************************
 
@@ -15,61 +14,151 @@ import base64
 
 #****************************************************************************************************
 
-class MainGUI:
+class PasswordGenApp:
     def __init__(self):
-        self.main_window = tk.Tk()
-        self.main_window.title('Secure Password Generator')
-        self.main_window.geometry("400x300")
+        self.root = tk.Tk()
+        self.root.title('passwordGen - Simple Password Generator')
+        self.root.geometry("540x380")
+        self.root.resizable(False, False)
+        self.root.configure(bg="#0d1117")
 
-        # Frames for layout
-        self.top_frame = tk.Frame(self.main_window)
-        self.mid_frame = tk.Frame(self.main_window)
-        self.bottom_frame = tk.Frame(self.main_window)
+        # Style configuration.
+        self.font_title = ("Segoe UI", 15, "bold")
+        self.font_text = ("Segoe UI", 10)
+        self.font_button = ("Segoe UI", 10, "bold")
+        self.accent_color = "#58a6ff"
+        self.secondary_color = "#2ea043"
+        self.text_color = "#c9d1d9"
+        self.bg_color = "#0d1117"
+        self.panel_color = "#161b22"
+        self.muted_text = "#8b949e"
 
-        # Password display
-        self.result_label = tk.Label(self.top_frame, text='Generated Password:')
-        self.result_label.config(fg="Green")
-        self.result_text = scrolledtext.ScrolledText(self.top_frame, wrap=tk.WORD, width=40, height=3, state='disabled')
+        # Header
+        tk.Label(
+            self.root,
+            text="🔐 passwordGen",
+            bg=self.bg_color,
+            fg=self.accent_color,
+            font=self.font_title
+        ).pack(pady=(18, 3))
 
-        # Password length input
-        self.length_label = tk.Label(self.mid_frame, text='Password Length:')
-        self.length_entry = tk.Entry(self.mid_frame, width=5)
-        self.length_entry.insert(0, "64")  # Default length to 64 for strong security
+        tk.Label(
+            self.root,
+            text="Generate cryptographically secure passwords instantly.",
+            bg=self.bg_color,
+            fg=self.muted_text,
+            font=("Segoe UI", 9)
+        ).pack(pady=(0, 12))
 
-        # Buttons
-        self.generate_button = tk.Button(self.mid_frame, text='Generate', relief="ridge", command=self.generate_password)
-        self.copy_button = tk.Button(self.bottom_frame, text='Copy', relief="ridge", command=self.copy_to_clipboard)
-        self.save_button = tk.Button(self.bottom_frame, text='Save', relief="ridge", command=self.save_to_file)
-        self.quit_button = tk.Button(self.bottom_frame, text='Quit', relief="ridge", command=self.main_window.quit)
-        self.quit_button.config(fg="Red")
+        #Output Panel.
+        output_frame = tk.Frame(self.root, bg=self.panel_color, bd=1, relief="flat")
+        output_frame.pack(pady=10, padx=25, fill="x")
 
-        # Pack widgets
-        self.result_label.pack(side='top', pady=5)
-        self.result_text.pack(side='top', padx=5, pady=5)
+        tk.Label(
+            output_frame,
+            text="Generated Password:",
+            bg=self.panel_color,
+            fg=self.text_color
+        ).pack(anchor="w", padx=10, pady=(8, 0))
 
-        self.length_label.pack(side='left', padx=5)
-        self.length_entry.pack(side='left', padx=5)
-        self.generate_button.pack(side='left', padx=5)
+        self.output_box = scrolledtext.ScrolledText(
+            output_frame,
+            wrap=tk.WORD,
+            width=60,
+            height=3,
+            state="disabled",
+            bg="#0d1117",
+            fg="#00ff9f",
+            insertbackground="white",
+            font=("Consolas", 10),
+            relief="flat",
+            padx=10,
+            pady=8
+        )
+        self.output_box.pack(padx=10, pady=(4, 8))
 
-        self.copy_button.pack(side='left', padx=5)
-        self.save_button.pack(side='left', padx=5)
-        self.quit_button.pack(side='left', padx=5)
+        # Frame for length input and generate buttons.
+        input_frame = tk.Frame(self.root, bg=self.bg_color)
+        input_frame.pack(pady=8)
 
-        self.top_frame.pack(pady=10)
-        self.mid_frame.pack(pady=10)
-        self.bottom_frame.pack(pady=10)
+        tk.Label(
+            input_frame,
+            text="Password Length:",
+            bg=self.bg_color,
+            fg=self.text_color
+        ).grid(row=0, column=0, padx=6)
 
-        tk.mainloop()
+        self.length_entry = tk.Entry(
+            input_frame,
+            width=6,
+            font=self.font_text,
+            justify="center",
+            bg=self.panel_color,
+            fg=self.text_color,
+            insertbackground=self.text_color,
+            relief="flat"
+        )
+        self.length_entry.insert(0, "64")
+        self.length_entry.grid(row=0, column=1, padx=6)
+
+        tk.Button(
+            input_frame,
+            text="Generate",
+            font=self.font_button,
+            bg=self.accent_color,
+            fg="#0d1117",
+            activebackground=self.accent_color,
+            activeforeground="#0d1117",
+            relief="flat",
+            width=14,
+            cursor="hand2",
+            command=self.generate_password
+        ).grid(row=0, column=2, padx=10)
+
+        #Bottom buttons.
+        button_frame = tk.Frame(self.root, bg=self.bg_color)
+        button_frame.pack(pady=22)
+
+        self._create_button(button_frame, "Copy", self.copy_password, self.accent_color)
+        self._create_button(button_frame, "Save", self.save_password, self.secondary_color)
+        self._create_button(button_frame, "Quit", self.root.quit, "#ff5555")
+
+        #Footer.
+        tk.Label(
+            self.root,
+            text="© 2025 Kyle McColgan - Built with Python 🐍",
+            bg=self.bg_color,
+            fg=self.muted_text,
+            font=("Segoe UI", 8)
+        ).pack(side="bottom", pady=6)
+
+        self.root.mainloop()
+
+    def _create_button(self, parent, text, command, color):
+        """Helper function to create modern, flat-style buttons."""
+        return tk.Button(
+            parent,
+            text=text,
+            font=self.font_button,
+            bg=color,
+            fg="#0d1117",
+            activebackground=color,
+            activeforeground="#0d1117",
+            relief="flat",
+            width=10,
+            cursor="hand2",
+            command=command
+        ).pack(side="left", padx=10)
 
     def generate_password(self):
         # Retrieve the desired password length
         try:
             length = int(self.length_entry.get())
-            if length < 8 or length > 512:
-                messagebox.showwarning("Warning", "Password length should be between 8 and 512 characters.")
+            if not 8 <= length <= 512:
+                messagebox.showwarning("Invalid Length", "Password length must be between 8 and 512 characters.")
                 return
         except ValueError:
-            messagebox.showerror("Error", "Please enter a valid number for password length.")
+            messagebox.showerror("Invalid Input", "Please enter a valid number.")
             return
 
         # Generate password
@@ -79,31 +168,32 @@ class MainGUI:
         password = base64.b64encode(random_bytes).decode('utf-8')[:length]
 
         # Display password in text widget
-        self.result_text.config(state='normal')
-        self.result_text.delete(1.0, tk.END)
-        self.result_text.insert(tk.END, password)
-        self.result_text.config(state='disabled')
+        self.output_box.config(state="normal")
+        self.output_box.delete(1.0, tk.END)
+        self.output_box.insert(tk.END, password)
+        self.output_box.config(state='disabled')
 
-    def copy_to_clipboard(self):
-        password = self.result_text.get(1.0, tk.END).strip()
+    def copy_password(self):
+        password = self.output_box.get(1.0, tk.END).strip()
         if password:
-            self.main_window.clipboard_clear()
-            self.main_window.clipboard_append(password)
+            self.root.clipboard_clear()
+            self.root.clipboard_append(password)
             messagebox.showinfo("Copied", "Password copied to clipboard!")
         else:
-            messagebox.showwarning("Warning", "No password to copy.")
+            messagebox.showwarning("No Password", "Please generate a password first.")
 
-    def save_to_file(self):
-        password = self.result_text.get(1.0, tk.END).strip()
+    def save_password(self):
+        password = self.output_box.get(1.0, tk.END).strip()
         if password:
             with open("generated_password.txt", "w") as file:
                 file.write(password)
             messagebox.showinfo("Saved", "Password saved to generated_password.txt")
         else:
-            messagebox.showwarning("Warning", "No password to save.")
+            messagebox.showwarning("No Password", "Please generate a password first.")
 
 #****************************************************************************************************
 
-if __name__ == '__main__':
-    main_gui = MainGUI()
+if __name__ == "__main__":
+    PasswordGenApp()
+
 #****************************************************************************************************

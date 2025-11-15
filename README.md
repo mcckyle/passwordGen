@@ -32,7 +32,7 @@ Securely generate strong passwords with ease using `passwordGen`, a Python-based
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/passwordGen.git
+   git clone https://github.com/mcckyle/passwordGen.git
    cd passwordGen
    ```
 2. Run the application:
@@ -75,7 +75,7 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 ## **Contact**
-Developed by [Kyle McColgan](mailto:kdmbus21@gmail.com). Connect with me on [LinkedIn](https://www.linkedin.com/in/kylemccolgan).
+Developed in Saint Louis by Kyle McColgan. Connect with me on [LinkedIn](https://www.linkedin.com/in/kylemccolgan).
 
 ---
 
